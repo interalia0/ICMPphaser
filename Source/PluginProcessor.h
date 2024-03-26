@@ -64,6 +64,7 @@ public:
 
 
 private:
+    juce::dsp::DryWetMixer<float> drywet;
     Phaser phaserL;
     Phaser phaserR;
 

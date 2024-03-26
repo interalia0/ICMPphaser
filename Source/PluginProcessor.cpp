@@ -98,6 +98,9 @@ void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     spec.numChannels = getTotalNumInputChannels();
     spec.maximumBlockSize = samplesPerBlock;
     
+    drywet.prepare(spec);
+    drywet.setMixingRule(juce::dsp::DryWetMixingRule::balanced);
+
     
     phaserL.prepare(spec, sampleRate);
     phaserR.prepare(spec, sampleRate);
@@ -146,43 +149,36 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
     auto rate = treeState.getRawParameterValue("rate")->load();
     auto depth = treeState.getRawParameterValue("depth")->load();
+    auto mix = treeState.getRawParameterValue("mix")->load();
 
     phaserL.setRate(rate);
     phaserR.setRate(rate);
-
     phaserL.setDepth(depth);
     phaserR.setDepth(depth);
+    
+    juce::dsp::AudioBlock<float> block(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(block);
+    auto input = context.getInputBlock();
+    auto output = context.getOutputBlock();
 
+    drywet.pushDrySamples(input);
+    drywet.setWetMixProportion(mix);
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* inSt = buffer.getReadPointer(channel);
-//        auto* inL = buffer.getReadPointer (0);
-//        auto* inR = buffer.getReadPointer (1);
-
-        auto* outSt = buffer.getWritePointer(channel);
-//        auto* outL = buffer.getWritePointer (0);
-//        auto* outR = buffer.getWritePointer (1);
-
+        auto* dataIn = input.getChannelPointer(channel);
+        auto* dataOut = output.getChannelPointer(channel);
         
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-            outSt[sample] = phaserL.processSampleStereo(channel, inSt[sample]);
-//            outL[sample] = phaserL.processSample(inL[sample]);
-//            outR[sample] = phaserR.processSample(inR[sample]);
+            dataOut[sample] = phaserL.processSampleStereo(channel, dataIn[sample]);
         }
     }
+    drywet.mixWetSamples(output);
 }
 
 //==============================================================================
@@ -225,6 +221,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     using pID = juce::ParameterID;
     using range = juce::NormalisableRange<float>;
     
+    layout.add(std::make_unique<juce::AudioParameterFloat>(pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.1f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>(pID{"depth", 1}, "Depth", range{0.f, 100.f, 1.f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>(pID{"rate", 1}, "Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
     
