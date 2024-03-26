@@ -46,17 +46,17 @@ float Filter::getG_value() const {
 }
 
 float Filter::getS_Value() {
-    float storageComponent = 0.f;
-    storageComponent = a1 * xz_1 + a2 * xz_2 - b1 * yz_1 - b2 * yz_2;
-    return storageComponent;
+    float storedS_value = 0.f;
+    storedS_value = a1 * xz_1 + a2 * xz_2 - b1 * yz_1 - b2 * yz_2;
+    return storedS_value;
 }
 
 /// Old method for getting the S values for stereo processing.
 
 float Filter::getS_valueSt(int channel) {
-    float storageComponent = 0.f;
-    storageComponent = a1 * xn_1stereo[channel] + a2 * xn_2stereo[channel] - b1 * yn_1stereo[channel] - b2 * yn_2stereo[channel];
-    return storageComponent;
+    float storedS_value = 0.f;
+    storedS_value = a1 * xn_1stereo[channel] + a2 * xn_2stereo[channel] - b1 * yn_1stereo[channel] - b2 * yn_2stereo[channel];
+    return storedS_value;
 }
 
 void Filter::updateCoefficents() {

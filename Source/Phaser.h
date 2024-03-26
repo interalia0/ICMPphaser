@@ -19,7 +19,8 @@ public:
     void prepare(juce::dsp::ProcessSpec& spec, double sampleRate);
     void setRate(float rate);
     void setDepth(float depth);
-    void setFeedback(int feedback);
+    void setFeedback(float feedback);
+    void setResonance(float resonance);
     void setPhaseReversal(bool phase);
     float processSample(float inputSample);
     
@@ -30,11 +31,12 @@ private:
     float mDepth = 0.f;
     float mRate = 0.5f;
     float mFeedback = 0.f;
+    float mResonance = 0.7f;
     bool mIsPhaseFlipped = false;
     
     static constexpr int numFilters = 6;
-    const float apfMinFrequencies[6] = {32, 68, 96, 212, 320, 636};
-    const float apfMaxFrequencies[6] = {1500, 3400, 4800, 10000, 16000, 20480};
+    const float apfMinFreq[numFilters] = {32, 68, 96, 212, 320, 636};
+    const float apfMaxFreq[numFilters] = {1500, 3400, 4800, 10000, 16000, 20480};
 
     std::array<Filter, numFilters> apf;
     std::array<float, numFilters> apfOutputs;

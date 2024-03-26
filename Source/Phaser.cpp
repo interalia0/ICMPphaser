@@ -34,13 +34,17 @@ void Phaser::setRate(float rate) {
 }
 
 void Phaser::setDepth(float depth) {
-    jassert(juce::isPositiveAndBelow(depth, static_cast<float>(101.f)));
+    jassert(juce::isPositiveAndBelow(depth, 101.f));
     this->mDepth = depth;
 }
 
-void Phaser::setFeedback(int feedback) {
-    jassert(juce::isPositiveAndBelow (feedback, static_cast<float> (101.f)));
+void Phaser::setFeedback(float feedback) {
+    jassert(juce::isPositiveAndBelow (feedback, 101.f));
     this->mFeedback = feedback;
+}
+
+void Phaser::setResonance(float resonance) {
+    this->mResonance = resonance;
 }
 
 void Phaser::setPhaseReversal(bool phase) {
@@ -57,35 +61,37 @@ float Phaser::processSample(float inputSample) {
         modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
     }
     
-    for (int i=0; i<numFilters; ++i) {
-        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
+    for (int i = 0; i < numFilters; ++i) {
+        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFreq[i], apfMaxFreq[i]));
+    }
+    for (int i = 0; i < numFilters; ++i) {
+        apf[i].setQ(mResonance);
     }
     
     float gamma1 = apf[5].getG_value();
-    float gamma2 = apf[4].getG_value()*gamma1;
-    float gamma3 = apf[3].getG_value()*gamma2;
-    float gamma4 = apf[2].getG_value()*gamma3;
-    float gamma5 = apf[1].getG_value()*gamma4;
-    float gamma6 = apf[0].getG_value()*gamma5;
+    float gamma2 = apf[4].getG_value() * gamma1;
+    float gamma3 = apf[3].getG_value() * gamma2;
+    float gamma4 = apf[2].getG_value() * gamma3;
+    float gamma5 = apf[1].getG_value() * gamma4;
+    float gamma6 = apf[0].getG_value() * gamma5;
     
     float K = mFeedback / 1000;
-    float alpha0 = 1.f / (1.f + K*gamma6);
+    float alpha0 = 1.f / (1.f + K * gamma6);
     
-    float Sn = gamma5*apf[0].getS_Value() +
-               gamma4*apf[1].getS_Value() +
-               gamma3*apf[2].getS_Value() +
-               gamma2*apf[3].getS_Value() +
-               gamma1*apf[4].getS_Value() +
+    float Sn = gamma5 * apf[0].getS_Value() +
+               gamma4 * apf[1].getS_Value() +
+               gamma3 * apf[2].getS_Value() +
+               gamma2 * apf[3].getS_Value() +
+               gamma1 * apf[4].getS_Value() +
                apf[5].getS_Value();
     
-    float u = alpha0*(inputSample - K*Sn);
-                             
+    float u = alpha0 * (inputSample - K * Sn);
     float apfInput = u;
+    
     for (int i = 0; i < numFilters; ++i) {
         apfOutputs[i] = apf[i].processSample(apfInput);
         apfInput = apfOutputs[i];
     }
-    
     float finalApfOutput = apfInput;
     
     float output = 0.707 * inputSample + 0.707 * finalApfOutput;
@@ -101,7 +107,7 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     auto modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
     
     for (int i=0; i<numFilters; ++i) {
-        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
+        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFreq[i], apfMaxFreq[i]));
     }
     
     float gamma1 = apf[5].getG_value();
