@@ -43,23 +43,24 @@ void Phaser::setFeedback(int feedback) {
     this->mFeedback = feedback;
 }
 
-float Phaser::processSampleMono(float inputSample) {
+float Phaser::processSample(float inputSample) {
     auto lfoOut = lfo.processSample(0.f);
     auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
     auto modValue = lfoOut * depth;
     auto modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
     
     for (int i=0; i<numFilters; ++i) {
-        apf[i].setCutoff(juce::jlimit(apfMinFrequencies[i], apfMaxFrequencies[i], modHz));
+        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
     }
+    
     float gamma1 = apf[5].getG_value();
     float gamma2 = apf[4].getG_value()*gamma1;
     float gamma3 = apf[3].getG_value()*gamma2;
     float gamma4 = apf[2].getG_value()*gamma3;
     float gamma5 = apf[1].getG_value()*gamma4;
     float gamma6 = apf[0].getG_value()*gamma5;
-
-    float K = mFeedback / 100;
+    
+    float K = mFeedback / 1000;
     float alpha0 = 1.f / (1.f + K*gamma6);
 
     float Sn = gamma5*apf[0].getS_Value() +
@@ -70,7 +71,7 @@ float Phaser::processSampleMono(float inputSample) {
                apf[5].getS_Value();
     float u = alpha0*(inputSample - K*Sn);
                          
-    auto apf1 = apf[0].processSampleMono(inputSample);
+    auto apf1 = apf[0].processSampleMono(u);
     auto apf2 = apf[1].processSampleMono(apf1);
     auto apf3 = apf[2].processSampleMono(apf2);
     auto apf4 = apf[3].processSampleMono(apf3);
@@ -81,6 +82,8 @@ float Phaser::processSampleMono(float inputSample) {
     return output;
 }
 
+// Old function for multi channel processing.
+
 float Phaser::processSampleStereo(int channel, float inputSample) {
     auto lfoOut = lfo.processSample(0.f);
     auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
@@ -88,7 +91,8 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     auto modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
     
     for (int i=0; i<numFilters; ++i) {
-        apf[i].setCutoff(juce::jlimit(apfMinFrequencies[i], apfMaxFrequencies[i], modHz));
+        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
+
     }
     
     float gamma1 = apf[5].getG_value();

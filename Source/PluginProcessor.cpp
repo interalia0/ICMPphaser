@@ -101,8 +101,10 @@ void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 //    drywet.prepare(spec);
 //    drywet.setMixingRule(juce::dsp::DryWetMixingRule::balanced);
     
-    phaser.prepare(spec, sampleRate);
-    phaser.reset();
+    phaserL.prepare(spec, sampleRate);
+    phaserL.reset();
+    phaserR.prepare(spec, sampleRate);
+    phaserR.reset();
 
 }
 
@@ -151,9 +153,12 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 //    auto mix = treeState.getRawParameterValue("mix")->load();
     auto feedback = treeState.getRawParameterValue("feedback")->load();
 
-    phaser.setRate(rate);
-    phaser.setDepth(depth);
-    phaser.setFeedback(feedback);
+    phaserL.setRate(rate);
+    phaserL.setDepth(depth);
+    phaserL.setFeedback(feedback);
+    phaserR.setRate(rate);
+    phaserR.setDepth(depth);
+    phaserR.setFeedback(feedback);
     
     juce::dsp::AudioBlock<float> block(buffer);
     juce::dsp::ProcessContextReplacing<float> context(block);
@@ -169,7 +174,15 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         auto* dataOut = output.getChannelPointer(channel);
         
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-            dataOut[sample] = phaser.processSampleStereo(channel, dataIn[sample]);
+            if (channel == 0) {
+                auto phaserLeftOut = phaserL.processSample(dataIn[sample]);
+                dataOut[sample] = phaserLeftOut;
+            }
+            else if (channel == 1) {
+                auto phaserRightOut = phaserR.processSample(dataIn[sample]);
+                dataOut[sample] = phaserRightOut;
+            }
+            
         }
     }
 //    drywet.mixWetSamples(output);

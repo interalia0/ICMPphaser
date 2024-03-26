@@ -22,10 +22,10 @@ public:
     void setDepth(float depth);
     void setFeedback(int feedback);
     
-    float processSampleMono(float inputSample);
-    float processSampleStereo(int channel, float inputSample);
-
+    float processSample(float inputSample);
     
+    __attribute__((deprecated("not implemented, use processSample instead")))
+    float processSampleStereo(int channel, float inputSample);    
 private:
     float doBipolarModulation(float bipolarModulatorValue, float minValue, float maxValue);
     void update();
