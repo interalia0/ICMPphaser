@@ -18,7 +18,7 @@
         <FILE id="gnNxPG" name="EditorLnf.cpp" compile="1" resource="0" file="Source/EditorLnf.cpp"/>
         <FILE id="MUOoOb" name="EditorLnf.h" compile="0" resource="0" file="Source/EditorLnf.h"/>
         <FILE id="bw3LFh" name="MyColours.h" compile="0" resource="0" file="Source/MyColours.h"/>
-        <FILE id="tBQTXH" name="RotatedLabel.h" compile="0" resource="0" file="Source/RotatedLabel.h"/>
+        <FILE id="m6oQ1u" name="RotatedLabel.h" compile="0" resource="0" file="Source/RotatedLabel.h"/>
       </GROUP>
       <FILE id="HilPRR" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

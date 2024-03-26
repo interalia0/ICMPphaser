@@ -73,7 +73,7 @@ EditorContent::EditorContent (juce::AudioProcessorValueTreeState& treeState,
     
     addAndMakeVisible(rotatedLabel);
     rotatedLabel.setText("Phaser", juce::dontSendNotification);
-    rotatedLabel.setFont(juce::Font(30.f));
+    rotatedLabel.setFont(juce::Font(20.f));
     rotatedLabel.setColour(juce::Label::textColourId, juce::Colours::aquamarine);
 }
 
@@ -83,10 +83,10 @@ EditorContent::~EditorContent()
 
 void EditorContent::resized()
 {
-    rateDial.setBounds     (72, 90, 80, 80);
-    qDial.setBounds        (164, 90,  80, 80);
-    feedbackDial.setBounds (256, 90,  80, 80);
-    offsetDial.setBounds   (348, 90,  80, 80);
+    rateDial.setBounds     (72, 90, 90, 90);
+    qDial.setBounds        (164, 90, 90, 90);
+    feedbackDial.setBounds (256, 90, 90, 90);
+    offsetDial.setBounds   (348, 90, 90, 90);
     
     iGainSlider.setBounds  (0, 0, 60, 200);
     depthSlider.setBounds  (60, 30, 380, 40);

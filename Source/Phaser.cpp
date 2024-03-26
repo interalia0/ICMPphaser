@@ -68,9 +68,7 @@ float Phaser::processSample(float inputSample) {
     for (int i = 0; i < numFilters; ++i) {
         apf[i].setQ(mResonance);
     }
-    
-
-    
+        
     float gamma1 = apf[5].getG_value();
     float gamma2 = apf[4].getG_value() * gamma1;
     float gamma3 = apf[3].getG_value() * gamma2;
