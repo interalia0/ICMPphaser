@@ -30,15 +30,15 @@ void Filter::setSampleRate(double sampleRate) {
 }
 
 void Filter::reset() {
-    std::fill(xn_1.begin(), xn_1.end(), 0.f);
-    std::fill(xn_2.begin(), xn_2.end(), 0.f);
-    std::fill(yn_1.begin(), yn_1.end(), 0.f);
-    std::fill(yn_2.begin(), yn_2.end(), 0.f);
+    xz_1=0;
+    xz_2=0;
+    yz_1=0;
+    yz_2=0;
     
-    xn_1f=0;
-    xn_2f=0;
-    yn_1f=0;
-    yn_2f=0;
+    std::fill(xn_1stereo.begin(), xn_1stereo.end(), 0.f);
+    std::fill(xn_2stereo.begin(), xn_2stereo.end(), 0.f);
+    std::fill(yn_1stereo.begin(), yn_1stereo.end(), 0.f);
+    std::fill(yn_2stereo.begin(), yn_2stereo.end(), 0.f);
 }
 
 float Filter::getG_value() const {
@@ -47,13 +47,15 @@ float Filter::getG_value() const {
 
 float Filter::getS_Value() {
     float storageComponent = 0.f;
-    storageComponent = a1 * xn_1f + a2 * xn_2f - b1 * yn_1f - b2 * yn_2f;
+    storageComponent = a1 * xz_1 + a2 * xz_2 - b1 * yz_1 - b2 * yz_2;
     return storageComponent;
 }
 
+// Old method for getting the S values for stereo processing.
+
 float Filter::getS_valueSt(int channel) {
     float storageComponent = 0.f;
-    storageComponent = a1 * xn_1[channel] + a2 * xn_2[channel] - b1 * yn_1[channel] - b2 * yn_2[channel];
+    storageComponent = a1 * xn_1stereo[channel] + a2 * xn_2stereo[channel] - b1 * yn_1stereo[channel] - b2 * yn_2stereo[channel];
     return storageComponent;
 }
 
@@ -99,28 +101,30 @@ void Filter::updateCoefficents() {
     }
 }
 
-float Filter::processSampleMono(float inputSample) {
+float Filter::processSample(float inputSample) {
     float x0 = inputSample;
-    y0 = (b0/a0)*x0 + (b1/a0)*xn_1f + (b2/a0)*xn_2f - (a1/a0)*yn_1f - (a2/a0)*yn_2f;
+    y0 = (b0/a0)*x0 + (b1/a0)*xz_1 + (b2/a0)*xz_2 - (a1/a0)*yz_1 - (a2/a0)*yz_2;
     auto outputSample = y0;
 
-    xn_2f = xn_1f;
-    xn_1f = x0;
-    yn_2f = yn_1f;
-    yn_1f = y0;
+    xz_2 = xz_1;
+    xz_1 = x0;
+    yz_2 = yz_1;
+    yz_1 = y0;
     
     return outputSample;
 }
 
+// Old method for stereo processing. Use two instances and process sample instead.
+
 float Filter::processSampleStereo(int channel, float inputSample) {
     float x0 = inputSample;
-    y0 = (b0/a0)*x0 + (b1/a0)*xn_1[channel] + (b2/a0)*xn_2[channel] - (a1/a0)*yn_1[channel] - (a2/a0)*yn_2[channel];
+    y0 = (b0/a0)*x0 + (b1/a0)*xn_1stereo[channel] + (b2/a0)*xn_2stereo[channel] - (a1/a0)*yn_1stereo[channel] - (a2/a0)*yn_2stereo[channel];
     auto outputSample = y0;
 
-    xn_2[channel] = xn_1[channel];
-    xn_1[channel] = x0;
-    yn_2[channel] = yn_1[channel];
-    yn_1[channel] = y0;
+    xn_2stereo[channel] = xn_1stereo[channel];
+    xn_1stereo[channel] = x0;
+    yn_2stereo[channel] = yn_1stereo[channel];
+    yn_1stereo[channel] = y0;
     
     return outputSample;
 }

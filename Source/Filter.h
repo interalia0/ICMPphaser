@@ -26,13 +26,14 @@ public:
     void setSampleRate (double sampleRate);
     float getG_value() const;
     float getS_Value();
-    float getS_valueSt(int channel);
-
 
     void reset ();
-    float processSampleMono (float inputSample);
+    float processSample (float inputSample);
+    
+    __attribute__((deprecated("not implemented, use processSample instead")))
     float processSampleStereo (int channel, float inputSample);
-
+    __attribute__((deprecated("not implemented, use getS_value instead")))
+    float getS_valueSt(int channel);
 private:
     void updateCoefficents();
 
@@ -44,16 +45,15 @@ private:
     float a0 = 1.f, a1 = 0.f, a2 = 0.f, b0 = 0.f, b1 = 0.f, b2 = 0.f;
     float y0;
     
-    std::array<float, 2> xn_1;
-    std::array<float, 2> xn_2;    
-    std::array<float, 2> yn_1;
-    std::array<float, 2> yn_2;
+    std::array<float, 2> xn_1stereo;
+    std::array<float, 2> xn_2stereo;
+    std::array<float, 2> yn_1stereo;
+    std::array<float, 2> yn_2stereo;
     
-    float xn_1f = 0;
-    float xn_2f = 0;
-    float yn_1f = 0;
-    float yn_2f = 0;
-
+    float xz_1 = 0;
+    float xz_2 = 0;
+    float yz_1 = 0;
+    float yz_2 = 0;
 
     FilterType mFilterType = FilterType::LPF;
 };

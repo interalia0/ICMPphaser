@@ -71,12 +71,12 @@ float Phaser::processSample(float inputSample) {
                apf[5].getS_Value();
     float u = alpha0*(inputSample - K*Sn);
                          
-    auto apf1 = apf[0].processSampleMono(u);
-    auto apf2 = apf[1].processSampleMono(apf1);
-    auto apf3 = apf[2].processSampleMono(apf2);
-    auto apf4 = apf[3].processSampleMono(apf3);
-    auto apf5 = apf[4].processSampleMono(apf4);
-    auto apf6 = apf[5].processSampleMono(apf5);
+    auto apf1 = apf[0].processSample(u);
+    auto apf2 = apf[1].processSample(apf1);
+    auto apf3 = apf[2].processSample(apf2);
+    auto apf4 = apf[3].processSample(apf3);
+    auto apf5 = apf[4].processSample(apf4);
+    auto apf6 = apf[5].processSample(apf5);
     
     float output = 0.707*inputSample + 0.707*apf6;
     return output;
