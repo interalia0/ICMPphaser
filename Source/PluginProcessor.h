@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class ICMPphaserAudioProcessor  : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
+class ICMPphaserAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
                             #endif
@@ -58,10 +58,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     juce::AudioProcessorValueTreeState::ParameterLayout createParamLayout();
-    juce::AudioProcessorValueTreeState treeState {*this, nullptr, "params", createParamLayout()};
-    
-    void parameterChanged(const juce::String& parameterID, float newValue) override;
-
+    juce::AudioProcessorValueTreeState treeState {*this, &undoManager, "params", createParamLayout()};
+    juce::UndoManager undoManager;
 
 private:
     juce::dsp::DryWetMixer<float> drywet;
