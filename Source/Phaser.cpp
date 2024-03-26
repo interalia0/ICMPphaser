@@ -44,8 +44,8 @@ void Phaser::setFeedback(float feedback) {
 }
 
 void Phaser::setResonance(float resonance) {
-    juce::jmap(resonance, 0.f, 1.f, 0.65f, 3.f);
-    this->mResonance = resonance;
+    auto mappedResonance = juce::jmap(resonance, 0.f, 1.f, 0.65f, 3.f);
+    this->mResonance = mappedResonance;
 }
 
 void Phaser::setPhaseReversal(bool phase) {
