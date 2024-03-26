@@ -20,6 +20,7 @@ public:
     
     void setRate(float rate);
     void setDepth(float depth);
+    void setFeedback(int feedback);
     
     float processSampleMono(float inputSample);
     float processSampleStereo(int channel, float inputSample);
@@ -31,6 +32,7 @@ private:
     
     float mDepth = 0.f;
     float mRate = 0.5f;
+    float mFeedback = 0.f;
     
     static constexpr int numFilters = 6;
     const float apfMinFrequencies[6] = {32, 68, 96, 212, 320, 636};

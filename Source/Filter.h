@@ -24,6 +24,10 @@ public:
     void setQ (float q);
     void setType (FilterType type);
     void setSampleRate (double sampleRate);
+    float getG_value() const;
+    float getS_Value();
+    float getS_valueSt(int channel);
+
 
     void reset ();
     float processSampleMono (float inputSample);
@@ -38,6 +42,7 @@ private:
     float mQ = 0.7;
     float alpha = 0.f, omega = 0.f;
     float a0 = 1.f, a1 = 0.f, a2 = 0.f, b0 = 0.f, b1 = 0.f, b2 = 0.f;
+    float y0;
     
     std::array<float, 2> xn_1;
     std::array<float, 2> xn_2;    

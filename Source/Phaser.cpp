@@ -38,6 +38,11 @@ void Phaser::setDepth(float depth) {
     this->mDepth = depth;
 }
 
+void Phaser::setFeedback(int feedback) {
+    jassert(juce::isPositiveAndBelow (feedback, static_cast<float> (101.f)));
+    this->mFeedback = feedback;
+}
+
 float Phaser::processSampleMono(float inputSample) {
     auto lfoOut = lfo.processSample(0.f);
     auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
@@ -47,6 +52,23 @@ float Phaser::processSampleMono(float inputSample) {
     for (int i=0; i<numFilters; ++i) {
         apf[i].setCutoff(juce::jlimit(apfMinFrequencies[i], apfMaxFrequencies[i], modHz));
     }
+    float gamma1 = apf[5].getG_value();
+    float gamma2 = apf[4].getG_value()*gamma1;
+    float gamma3 = apf[3].getG_value()*gamma2;
+    float gamma4 = apf[2].getG_value()*gamma3;
+    float gamma5 = apf[1].getG_value()*gamma4;
+    float gamma6 = apf[0].getG_value()*gamma5;
+
+    float K = mFeedback / 100;
+    float alpha0 = 1.f / (1.f + K*gamma6);
+
+    float Sn = gamma5*apf[0].getS_Value() +
+               gamma4*apf[1].getS_Value() +
+               gamma3*apf[2].getS_Value() +
+               gamma2*apf[3].getS_Value() +
+               gamma1*apf[4].getS_Value() +
+               apf[5].getS_Value();
+    float u = alpha0*(inputSample - K*Sn);
                          
     auto apf1 = apf[0].processSampleMono(inputSample);
     auto apf2 = apf[1].processSampleMono(apf1);
@@ -68,15 +90,35 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     for (int i=0; i<numFilters; ++i) {
         apf[i].setCutoff(juce::jlimit(apfMinFrequencies[i], apfMaxFrequencies[i], modHz));
     }
-                         
-    auto apf1 = apf[0].processSampleStereo(channel, inputSample);
+    
+    float gamma1 = apf[5].getG_value();
+    float gamma2 = apf[4].getG_value()*gamma1;
+    float gamma3 = apf[3].getG_value()*gamma2;
+    float gamma4 = apf[2].getG_value()*gamma3;
+    float gamma5 = apf[1].getG_value()*gamma4;
+    float gamma6 = apf[0].getG_value()*gamma5;
+    
+    float K = mFeedback / 1000;
+    float alpha0 = 1.f / (1.f + K*gamma6);
+    
+    float Sn = gamma5*apf[0].getS_valueSt(channel) +
+               gamma4*apf[1].getS_valueSt(channel) +
+               gamma3*apf[2].getS_valueSt(channel) +
+               gamma2*apf[3].getS_valueSt(channel) +
+               gamma1*apf[4].getS_valueSt(channel) +
+               apf[5].getS_valueSt(channel);
+    
+    float u = alpha0*(inputSample - K*Sn);
+
+    auto apf1 = apf[0].processSampleStereo(channel, u);
     auto apf2 = apf[1].processSampleStereo(channel, apf1);
     auto apf3 = apf[2].processSampleStereo(channel, apf2);
     auto apf4 = apf[3].processSampleStereo(channel, apf3);
     auto apf5 = apf[4].processSampleStereo(channel, apf4);
     auto apf6 = apf[5].processSampleStereo(channel, apf5);
-    
+
     float output = 0.707*inputSample + 0.707*apf6;
     return output;
+    
 }
 

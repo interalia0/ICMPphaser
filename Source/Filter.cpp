@@ -41,6 +41,21 @@ void Filter::reset() {
     yn_2f=0;
 }
 
+float Filter::getG_value() const {
+    return a0;
+}
+
+float Filter::getS_Value() {
+    float storageComponent = 0.f;
+    storageComponent = a1 * xn_1f + a2 * xn_2f - b1 * yn_1f - b2 * yn_2f;
+    return storageComponent;
+}
+
+float Filter::getS_valueSt(int channel) {
+    float storageComponent = 0.f;
+    storageComponent = a1 * xn_1[channel] + a2 * xn_2[channel] - b1 * yn_1[channel] - b2 * yn_2[channel];
+    return storageComponent;
+}
 
 void Filter::updateCoefficents() {
     omega = (2 * mPI) * (mFc / mFs);
@@ -86,7 +101,7 @@ void Filter::updateCoefficents() {
 
 float Filter::processSampleMono(float inputSample) {
     float x0 = inputSample;
-    float y0 = (b0/a0)*x0 + (b1/a0)*xn_1f + (b2/a0)*xn_2f - (a1/a0)*yn_1f - (a2/a0)*yn_2f;
+    y0 = (b0/a0)*x0 + (b1/a0)*xn_1f + (b2/a0)*xn_2f - (a1/a0)*yn_1f - (a2/a0)*yn_2f;
     auto outputSample = y0;
 
     xn_2f = xn_1f;
@@ -99,7 +114,7 @@ float Filter::processSampleMono(float inputSample) {
 
 float Filter::processSampleStereo(int channel, float inputSample) {
     float x0 = inputSample;
-    float y0 = (b0/a0)*x0 + (b1/a0)*xn_1[channel] + (b2/a0)*xn_2[channel] - (a1/a0)*yn_1[channel] - (a2/a0)*yn_2[channel];
+    y0 = (b0/a0)*x0 + (b1/a0)*xn_1[channel] + (b2/a0)*xn_2[channel] - (a1/a0)*yn_1[channel] - (a2/a0)*yn_2[channel];
     auto outputSample = y0;
 
     xn_2[channel] = xn_1[channel];
