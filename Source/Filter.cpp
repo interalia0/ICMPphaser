@@ -51,7 +51,7 @@ float Filter::getS_Value() {
     return storageComponent;
 }
 
-// Old method for getting the S values for stereo processing.
+/// Old method for getting the S values for stereo processing.
 
 float Filter::getS_valueSt(int channel) {
     float storageComponent = 0.f;
@@ -114,7 +114,7 @@ float Filter::processSample(float inputSample) {
     return outputSample;
 }
 
-// Old method for stereo processing. Use two instances and process sample instead.
+/// Old method for stereo processing. Use two instances and process sample instead.
 
 float Filter::processSampleStereo(int channel, float inputSample) {
     float x0 = inputSample;

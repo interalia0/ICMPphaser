@@ -30,9 +30,11 @@ public:
     void reset ();
     float processSample (float inputSample);
     
-    __attribute__((deprecated("not implemented, use processSample instead")))
+    
+    /// Old methods for stereo processing. Use two instances of the filter and processSample instead.
+    __attribute__((deprecated("Use processSample instead")))
     float processSampleStereo (int channel, float inputSample);
-    __attribute__((deprecated("not implemented, use getS_value instead")))
+    __attribute__((deprecated("Use getS_value instead")))
     float getS_valueSt(int channel);
 private:
     void updateCoefficents();

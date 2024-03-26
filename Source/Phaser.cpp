@@ -62,27 +62,29 @@ float Phaser::processSample(float inputSample) {
     
     float K = mFeedback / 1000;
     float alpha0 = 1.f / (1.f + K*gamma6);
-
+    
     float Sn = gamma5*apf[0].getS_Value() +
                gamma4*apf[1].getS_Value() +
                gamma3*apf[2].getS_Value() +
                gamma2*apf[3].getS_Value() +
                gamma1*apf[4].getS_Value() +
                apf[5].getS_Value();
-    float u = alpha0*(inputSample - K*Sn);
-                         
-    auto apf1 = apf[0].processSample(u);
-    auto apf2 = apf[1].processSample(apf1);
-    auto apf3 = apf[2].processSample(apf2);
-    auto apf4 = apf[3].processSample(apf3);
-    auto apf5 = apf[4].processSample(apf4);
-    auto apf6 = apf[5].processSample(apf5);
     
-    float output = 0.707*inputSample + 0.707*apf6;
+    float u = alpha0*(inputSample - K*Sn);
+                             
+    float apfInput = u;
+    for (int i = 0; i < numFilters; ++i) {
+        apfOutputs[i] = apf[i].processSample(apfInput);
+        apfInput = apfOutputs[i];
+    }
+    
+    float finalApfOutput = apfInput;
+    
+    float output = 0.707 * inputSample + 0.707 * finalApfOutput;
     return output;
 }
 
-// Old function for multi channel processing.
+/// Old function for multi channel processing.
 
 float Phaser::processSampleStereo(int channel, float inputSample) {
     auto lfoOut = lfo.processSample(0.f);
