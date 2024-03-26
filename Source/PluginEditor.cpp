@@ -8,14 +8,28 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "MyColours.h"
 
 //==============================================================================
-ICMPphaserAudioProcessorEditor::ICMPphaserAudioProcessorEditor (ICMPphaserAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+ICMPphaserAudioProcessorEditor::ICMPphaserAudioProcessorEditor (ICMPphaserAudioProcessor& p,
+                                                                juce::AudioProcessorValueTreeState& treeState,
+                                                                juce::UndoManager& um)
+    : AudioProcessorEditor (&p), audioProcessor (p), undoManager (um), editorContent (treeState, um)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    juce::ignoreUnused (audioProcessor);
+
+    const auto ratio = static_cast<double> (defaultWidth) / defaultHeight;
+    setResizable (false, true);
+    getConstrainer()->setFixedAspectRatio (ratio);
+    getConstrainer()->setSizeLimits (defaultWidth / 2, defaultHeight / 2,
+                                     defaultWidth * 2, defaultHeight * 2);
+    setSize (defaultWidth * 1.5, defaultHeight * 1.5);
+    editorContent.setSize (defaultWidth * 1.5, defaultHeight * 1.5);
+    
+    addAndMakeVisible (editorContent);
+    
 }
 
 ICMPphaserAudioProcessorEditor::~ICMPphaserAudioProcessorEditor()
@@ -25,16 +39,33 @@ ICMPphaserAudioProcessorEditor::~ICMPphaserAudioProcessorEditor()
 //==============================================================================
 void ICMPphaserAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll (juce::Colours::grey);
 }
 
 void ICMPphaserAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    const auto factor = static_cast<float> (getWidth()) / defaultWidth;
+    editorContent.setTransform (juce::AffineTransform::scale (factor));
+}
+
+bool ICMPphaserAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
+{
+    const auto cmdZ = juce::KeyPress { 'z', juce::ModifierKeys::commandModifier, 0 };
+
+    if (key == cmdZ && undoManager.canUndo())
+    {
+        undoManager.undo();
+        return true;
+    }
+
+    const auto cmdShiftZ = juce::KeyPress { 'z', juce::ModifierKeys::commandModifier
+                                                 | juce::ModifierKeys::shiftModifier, 0 };
+
+    if (key == cmdShiftZ && undoManager.canRedo())
+    {
+        undoManager.redo();
+        return true;
+    }
+
+    return false;
 }

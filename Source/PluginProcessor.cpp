@@ -179,8 +179,9 @@ bool ICMPphaserAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ICMPphaserAudioProcessor::createEditor()
 {
-//    return new ICMPphaserAudioProcessorEditor (*this);
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new ICMPphaserAudioProcessorEditor (*this, treeState, undoManager);
+
+//    return new juce::GenericAudioProcessorEditor (*this);
 
 }
 
@@ -212,7 +213,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     using pID = juce::ParameterID;
     using range = juce::NormalisableRange<float>;
     
-    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.1f}, 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"gainIn", 1}, "Gain", range{0.f, 1.f, 0.01f}, 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.01f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"depth", 1}, "Lfo Depth", range{0.f, 100.f, 1.f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"rate", 1}, "Lfo Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"q", 1}, "Q", range{0.f, 1.f, 0.01f}, 0.5f));

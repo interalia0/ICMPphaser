@@ -57,7 +57,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    juce::AudioProcessorValueTreeState::ParameterLayout createParamLayout();
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParamLayout();
     juce::AudioProcessorValueTreeState treeState {*this, &undoManager, "params", createParamLayout()};
     juce::UndoManager undoManager;
 
