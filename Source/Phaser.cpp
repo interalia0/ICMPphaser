@@ -43,11 +43,19 @@ void Phaser::setFeedback(int feedback) {
     this->mFeedback = feedback;
 }
 
+void Phaser::setPhaseReversal(bool phase) {
+    this->mIsPhaseFlipped = phase;
+}
+
 float Phaser::processSample(float inputSample) {
     auto lfoOut = lfo.processSample(0.f);
     auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
     auto modValue = lfoOut * depth;
-    auto modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
+    if (mIsPhaseFlipped) {
+        modHz = juce::jmap(modValue, -1.f, 1.f, 20000.f, 20.f);
+    } else {
+        modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
+    }
     
     for (int i=0; i<numFilters; ++i) {
         apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
@@ -94,7 +102,6 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     
     for (int i=0; i<numFilters; ++i) {
         apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFrequencies[i], apfMaxFrequencies[i]));
-
     }
     
     float gamma1 = apf[5].getG_value();

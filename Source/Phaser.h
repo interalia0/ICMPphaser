@@ -20,6 +20,7 @@ public:
     void setRate(float rate);
     void setDepth(float depth);
     void setFeedback(int feedback);
+    void setPhaseReversal(bool phase);
     float processSample(float inputSample);
     
     /// Old function for multi channel processing.
@@ -29,6 +30,7 @@ private:
     float mDepth = 0.f;
     float mRate = 0.5f;
     float mFeedback = 0.f;
+    bool mIsPhaseFlipped = false;
     
     static constexpr int numFilters = 6;
     const float apfMinFrequencies[6] = {32, 68, 96, 212, 320, 636};
@@ -37,4 +39,6 @@ private:
     std::array<Filter, numFilters> apf;
     std::array<float, numFilters> apfOutputs;
     juce::dsp::Oscillator<float> lfo;
+    float modHz = 0.f;
+
 };
