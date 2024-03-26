@@ -147,30 +147,15 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-    
-    auto rate = treeState.getRawParameterValue("rate")->load();
-    auto depth = treeState.getRawParameterValue("depth")->load();
-    auto mix = treeState.getRawParameterValue("mix")->load();
-    auto feedback = treeState.getRawParameterValue("feedback")->load();
-    auto phaseOffset = treeState.getRawParameterValue("phaseOffset")->load();
-    auto q = treeState.getRawParameterValue("q")->load();
-    
-    phaserL.setRate(rate);
-    phaserL.setDepth(depth);
-    phaserL.setFeedback(feedback);
-    phaserL.setResonance(q);
-    phaserR.setRate(rate);
-    phaserR.setDepth(depth);
-    phaserR.setFeedback(feedback);
-    phaserR.setResonance(q);
-    phaserR.setPhaseReversal(phaseOffset);
-    
     juce::dsp::AudioBlock<float> block(buffer);
     juce::dsp::ProcessContextReplacing<float> context(block);
     auto input = context.getInputBlock();
     auto output = context.getOutputBlock();
+    
+    auto mix = treeState.getRawParameterValue("mix")->load();
     drywet.pushDrySamples(input);
     drywet.setWetMixProportion(mix);
+    updatePhaser();
     
     auto* inL = input.getChannelPointer(0);
     auto* inR = input.getChannelPointer(1);
@@ -183,7 +168,6 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         outL[sample] = phaserLeftOut;
         outR[sample] = phaserRightOut;
     }
-    
     drywet.mixWetSamples(output);
 }
 
@@ -238,3 +222,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     return layout;
 }
 
+void ICMPphaserAudioProcessor::updatePhaser() {
+    auto rate = treeState.getRawParameterValue("rate")->load();
+    auto depth = treeState.getRawParameterValue("depth")->load();
+    auto feedback = treeState.getRawParameterValue("feedback")->load();
+    auto phaseOffset = treeState.getRawParameterValue("phaseOffset")->load();
+    auto q = treeState.getRawParameterValue("q")->load();
+    
+    phaserL.setRate(rate);
+    phaserL.setDepth(depth);
+    phaserL.setFeedback(feedback);
+    phaserL.setResonance(q);
+    phaserR.setRate(rate);
+    phaserR.setDepth(depth);
+    phaserR.setFeedback(feedback);
+    phaserR.setResonance(q);
+    phaserR.setPhaseReversal(phaseOffset);
+}

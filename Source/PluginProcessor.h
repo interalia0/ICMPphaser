@@ -65,6 +65,8 @@ private:
     juce::dsp::DryWetMixer<float> drywet;
     Phaser phaserL;
     Phaser phaserR;
+    
+    void updatePhaser();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ICMPphaserAudioProcessor)
 };
