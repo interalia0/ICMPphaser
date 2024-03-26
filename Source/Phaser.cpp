@@ -69,6 +69,8 @@ float Phaser::processSample(float inputSample) {
         apf[i].setQ(mResonance);
     }
     
+
+    
     float gamma1 = apf[5].getG_value();
     float gamma2 = apf[4].getG_value() * gamma1;
     float gamma3 = apf[3].getG_value() * gamma2;
@@ -121,21 +123,21 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     float K = mFeedback / 1000;
     float alpha0 = 1.f / (1.f + K*gamma6);
     
-    float Sn = gamma5*apf[0].getS_valueSt(channel) +
-               gamma4*apf[1].getS_valueSt(channel) +
-               gamma3*apf[2].getS_valueSt(channel) +
-               gamma2*apf[3].getS_valueSt(channel) +
-               gamma1*apf[4].getS_valueSt(channel) +
-               apf[5].getS_valueSt(channel);
+    float Sn = gamma5*apf[0].getS_value(channel) +
+               gamma4*apf[1].getS_value(channel) +
+               gamma3*apf[2].getS_value(channel) +
+               gamma2*apf[3].getS_value(channel) +
+               gamma1*apf[4].getS_value(channel) +
+               apf[5].getS_value(channel);
     
     float u = alpha0*(inputSample - K*Sn);
 
-    auto apf1 = apf[0].processSampleStereo(channel, u);
-    auto apf2 = apf[1].processSampleStereo(channel, apf1);
-    auto apf3 = apf[2].processSampleStereo(channel, apf2);
-    auto apf4 = apf[3].processSampleStereo(channel, apf3);
-    auto apf5 = apf[4].processSampleStereo(channel, apf4);
-    auto apf6 = apf[5].processSampleStereo(channel, apf5);
+    auto apf1 = apf[0].processSample(channel, u);
+    auto apf2 = apf[1].processSample(channel, apf1);
+    auto apf3 = apf[2].processSample(channel, apf2);
+    auto apf4 = apf[3].processSample(channel, apf3);
+    auto apf5 = apf[4].processSample(channel, apf4);
+    auto apf6 = apf[5].processSample(channel, apf5);
 
     float output = 0.707*inputSample + 0.707*apf6;
     return output;

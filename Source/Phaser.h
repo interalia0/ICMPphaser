@@ -42,5 +42,4 @@ private:
     std::array<float, numFilters> apfOutputs;
     juce::dsp::Oscillator<float> lfo;
     float modHz = 0.f;
-
 };

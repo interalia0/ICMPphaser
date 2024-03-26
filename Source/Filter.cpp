@@ -45,7 +45,7 @@ float Filter::getG_value() const {
     return a0;
 }
 
-float Filter::getS_Value() {
+float Filter::getS_Value() const {
     float storedS_value = 0.f;
     storedS_value = a1 * xz_1 + a2 * xz_2 - b1 * yz_1 - b2 * yz_2;
     return storedS_value;
@@ -53,7 +53,7 @@ float Filter::getS_Value() {
 
 /// Old method for getting the S values for stereo processing.
 
-float Filter::getS_valueSt(int channel) {
+float Filter::getS_value(int channel) {
     float storedS_value = 0.f;
     storedS_value = a1 * xn_1stereo[channel] + a2 * xn_2stereo[channel] - b1 * yn_1stereo[channel] - b2 * yn_2stereo[channel];
     return storedS_value;
@@ -116,7 +116,7 @@ float Filter::processSample(float inputSample) {
 
 /// Old method for stereo processing. Use two instances and process sample instead.
 
-float Filter::processSampleStereo(int channel, float inputSample) {
+float Filter::processSample(int channel, float inputSample) {
     float x0 = inputSample;
     y0 = (b0/a0)*x0 + (b1/a0)*xn_1stereo[channel] + (b2/a0)*xn_2stereo[channel] - (a1/a0)*yn_1stereo[channel] - (a2/a0)*yn_2stereo[channel];
     auto outputSample = y0;

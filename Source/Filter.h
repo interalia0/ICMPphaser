@@ -25,17 +25,17 @@ public:
     void setType (FilterType type);
     void setSampleRate (double sampleRate);
     float getG_value() const;
-    float getS_Value();
+    float getS_Value() const;
 
     void reset ();
     float processSample (float inputSample);
     
     
     /// Old methods for stereo processing. Use two instances of the filter and processSample instead.
-    __attribute__((deprecated("Use processSample instead")))
-    float processSampleStereo (int channel, float inputSample);
-    __attribute__((deprecated("Use getS_value instead")))
-    float getS_valueSt(int channel);
+    __attribute__((deprecated("Use other processSample method instead")))
+    float processSample (int channel, float inputSample);
+    __attribute__((deprecated("Use other getS_value method instead")))
+    float getS_value(int channel);
 private:
     void updateCoefficents();
 
