@@ -93,6 +93,18 @@ void ICMPphaserAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.numChannels = getTotalNumInputChannels();
+    spec.maximumBlockSize = samplesPerBlock;
+    
+    
+    phaserL.prepare(spec, sampleRate);
+    phaserR.prepare(spec, sampleRate);
+
+    phaserL.reset();
+    phaserR.reset();
+    
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }
@@ -143,18 +155,33 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
+    auto rate = treeState.getRawParameterValue("rate")->load();
+    auto depth = treeState.getRawParameterValue("depth")->load();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    phaserL.setRate(rate);
+    phaserR.setRate(rate);
+
+    phaserL.setDepth(depth);
+    phaserR.setDepth(depth);
+
+    
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        auto* inSt = buffer.getReadPointer(channel);
+//        auto* inL = buffer.getReadPointer (0);
+//        auto* inR = buffer.getReadPointer (1);
 
-        // ..do something to the data...
+        auto* outSt = buffer.getWritePointer(channel);
+//        auto* outL = buffer.getWritePointer (0);
+//        auto* outR = buffer.getWritePointer (1);
+
+        
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
+            outSt[sample] = phaserL.processSampleStereo(channel, inSt[sample]);
+//            outL[sample] = phaserL.processSample(inL[sample]);
+//            outR[sample] = phaserR.processSample(inR[sample]);
+        }
     }
 }
 
@@ -166,7 +193,9 @@ bool ICMPphaserAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* ICMPphaserAudioProcessor::createEditor()
 {
-    return new ICMPphaserAudioProcessorEditor (*this);
+//    return new ICMPphaserAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
+
 }
 
 //==============================================================================
@@ -188,4 +217,20 @@ void ICMPphaserAudioProcessor::setStateInformation (const void* data, int sizeIn
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ICMPphaserAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::createParamLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    using pID = juce::ParameterID;
+    using range = juce::NormalisableRange<float>;
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(pID{"depth", 1}, "Depth", range{0.f, 100.f, 1.f}, 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(pID{"rate", 1}, "Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
+    
+    return layout;
+}
+
+void ICMPphaserAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
+{
 }

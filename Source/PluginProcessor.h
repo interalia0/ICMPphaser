@@ -9,11 +9,12 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Phaser.h"
 
 //==============================================================================
 /**
 */
-class ICMPphaserAudioProcessor  : public juce::AudioProcessor
+class ICMPphaserAudioProcessor  : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
                             #endif
@@ -55,8 +56,17 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParamLayout();
+    juce::AudioProcessorValueTreeState treeState {*this, nullptr, "params", createParamLayout()};
+    
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
+
 
 private:
+    Phaser phaserL;
+    Phaser phaserR;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ICMPphaserAudioProcessor)
 };

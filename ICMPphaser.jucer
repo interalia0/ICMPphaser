@@ -11,6 +11,10 @@
       <FILE id="ugwfE7" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="PoWhcJ" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="dpJzpC" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
+      <FILE id="YXRZxe" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
+      <FILE id="ekIMpm" name="Phaser.cpp" compile="1" resource="0" file="Source/Phaser.cpp"/>
+      <FILE id="ioUNju" name="Phaser.h" compile="0" resource="0" file="Source/Phaser.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>
