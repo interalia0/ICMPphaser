@@ -139,7 +139,7 @@ float Phaser::processSampleStereo(int channel, float inputSample) {
     auto apf5 = apf[4].processSample(channel, apf4);
     auto apf6 = apf[5].processSample(channel, apf5);
 
-    float output = 0.707*inputSample + 0.707*apf6;
+    float output = 0.303*inputSample + 0.707*apf6;
     return output;
     
 }

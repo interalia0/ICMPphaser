@@ -11,6 +11,9 @@
 #pragma once
 #include <JuceHeader.h>
 #include "Dial.h"
+#include "EditorLnf.h"
+#include "MyColours.h"
+#include "RotatedLabel.h"
 
 class EditorContent  : public juce::Component,
                        public Dial::Listener,
@@ -32,6 +35,8 @@ private:
     juce::Label iGainLabel, depthLabel, mixLabel;
     
     juce::SliderParameterAttachment iGainAttachment, depthAttachment, mixAttachment;
+    
+    RotatedLabel rotatedLabel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorContent)
 };
