@@ -14,6 +14,7 @@
 #include "EditorContent.h"
 #include "Dial.h"
 #include "MyColours.h"
+#include "RotatedLabel.h"
 
 //==============================================================================
 /**
@@ -35,6 +36,7 @@ private:
     ICMPphaserAudioProcessor& audioProcessor;
     juce::UndoManager& undoManager;
     EditorContent editorContent;
+    
     
     static constexpr int defaultWidth  {500};
     static constexpr int defaultHeight {200};

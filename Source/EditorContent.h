@@ -29,7 +29,7 @@ public:
     void dialValueChanged(Dial* dial) override;
     void sliderValueChanged (juce::Slider* slider) override;
     
-private:
+private:    
     Dial rateDial, qDial, feedbackDial, offsetDial;
     juce::Slider iGainSlider, depthSlider, mixSlider;
     juce::Label iGainLabel, depthLabel, mixLabel;

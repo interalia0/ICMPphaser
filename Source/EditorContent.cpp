@@ -34,15 +34,15 @@ EditorContent::EditorContent (juce::AudioProcessorValueTreeState& treeState,
     addAndMakeVisible(feedbackDial);
     addAndMakeVisible(offsetDial);
     
-//    addAndMakeVisible(iGainSlider);
+    addAndMakeVisible(iGainSlider);
     addAndMakeVisible(depthSlider);
     addAndMakeVisible(mixSlider);
     
-//    addAndMakeVisible(iGainLabel);
-//    iGainLabel.setText("Input Gain", juce::dontSendNotification);
-//    iGainLabel.setJustificationType(juce::Justification::centred);
-//    iGainLabel.setFont(juce::Font(15.f));
-//    iGainLabel.setColour(juce::Label::textColourId, juce::Colours::aquamarine);
+    addAndMakeVisible(iGainLabel);
+    iGainLabel.setText("Input Gain", juce::dontSendNotification);
+    iGainLabel.setJustificationType(juce::Justification::centred);
+    iGainLabel.setFont(juce::Font(15.f));
+    iGainLabel.setColour(juce::Label::textColourId, juce::Colours::aquamarine);
     
     addAndMakeVisible(mixLabel);
     mixLabel.setText("Mix", juce::dontSendNotification);
@@ -56,9 +56,9 @@ EditorContent::EditorContent (juce::AudioProcessorValueTreeState& treeState,
     depthLabel.setFont(juce::Font(20.f));
     depthLabel.setColour(juce::Label::textColourId, juce::Colours::aquamarine);
     
-//    iGainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-//    iGainSlider.setColour(juce::Slider::trackColourId, MyColours::blackGrey);
-//    iGainSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::grey);
+    iGainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+    iGainSlider.setColour(juce::Slider::trackColourId, MyColours::blackGrey);
+    iGainSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::grey);
     
     
     mixSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
@@ -70,11 +70,6 @@ EditorContent::EditorContent (juce::AudioProcessorValueTreeState& treeState,
     depthSlider.setColour(juce::Slider::trackColourId, MyColours::blackGrey);
     depthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 20);
     depthSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::grey);
-    
-    addAndMakeVisible(rotatedLabel);
-    rotatedLabel.setText("Phaser", juce::dontSendNotification);
-    rotatedLabel.setFont(juce::Font(20.f));
-    rotatedLabel.setColour(juce::Label::textColourId, juce::Colours::aquamarine);
 }
 
 EditorContent::~EditorContent()
@@ -92,7 +87,7 @@ void EditorContent::resized()
     depthSlider.setBounds  (60, 30, 380, 40);
     mixSlider.setBounds    (440, 0, 60, 200);
     
-    rotatedLabel.setBounds   (0, 0, 60, 200);
+    iGainLabel.setBounds   (0, 0, 60, 50);
     depthLabel.setBounds   (60, 8, 380, 20);
     mixLabel.setBounds     (440, 0, 60, 50);
 }

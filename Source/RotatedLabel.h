@@ -48,5 +48,5 @@ private:
 
     
     juce::AffineTransform transform;
-    float letterSpacing = 0.1f;
+    float letterSpacing = 0.4f;
 };

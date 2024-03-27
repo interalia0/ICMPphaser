@@ -153,6 +153,8 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto input = context.getInputBlock();
     auto output = context.getOutputBlock();
     
+    auto gainValuedB = treeState.getRawParameterValue("gainIn")->load();
+    auto gain = juce::Decibels::decibelsToGain(gainValuedB);
     auto mix = treeState.getRawParameterValue("mix")->load();
     drywet.pushDrySamples(input);
     drywet.setWetMixProportion(mix);
@@ -162,10 +164,12 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto* inR = input.getChannelPointer(1);
     auto* outL = output.getChannelPointer(0);
     auto* outR = output.getChannelPointer(1);
-        
+
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-        auto phaserLeftOut = phaserL.processSample(inL[sample]);
-        auto phaserRightOut = phaserR.processSample(inR[sample]);
+        auto gainSampleL = inL[sample] * gain;
+        auto gainSampleR = inR[sample] * gain;
+        auto phaserLeftOut = phaserL.processSample(gainSampleL);
+        auto phaserRightOut = phaserR.processSample(gainSampleR);
         outL[sample] = phaserLeftOut;
         outR[sample] = phaserRightOut;
     }
@@ -214,13 +218,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     using pID = juce::ParameterID;
     using range = juce::NormalisableRange<float>;
     
-    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"gainIn", 1}, "Gain", range{0.f, 1.f, 0.01f}, 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"gainIn", 1}, "Gain", range{-60.f, 12.f, 0.1f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.01f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"depth", 1}, "Lfo Depth", range{0.f, 100.f, 1.f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"rate", 1}, "Lfo Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"q", 1}, "Q", range{0.f, 1.f, 0.01f}, 0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"feedback", 1}, "Feedback", range{0.f, 100.f, 0.1f}, 0.f));
-    layout.add(std::make_unique<juce::AudioParameterBool>  (pID{"phaseOffset", 1}, "L/R Offset", false));
+    layout.add(std::make_unique<juce::AudioParameterBool>  (pID{"phaseOffset", 1}, "Offset", false));
 
     return layout;
 }
