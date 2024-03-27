@@ -15,6 +15,8 @@
 #include "Dial.h"
 #include "MyColours.h"
 #include "RotatedLabel.h"
+#include "HorizontalMeter.h"
+
 
 //==============================================================================
 /**
@@ -36,10 +38,9 @@ private:
     ICMPphaserAudioProcessor& audioProcessor;
     juce::UndoManager& undoManager;
     EditorContent editorContent;
-    
-    
+        
     static constexpr int defaultWidth  {500};
-    static constexpr int defaultHeight {200};
+    static constexpr int defaultHeight {250};
 
     struct SharedLnf
     {

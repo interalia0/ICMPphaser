@@ -105,6 +105,12 @@ void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     phaserL.reset();
     phaserR.prepare(spec, sampleRate);
     phaserR.reset();
+    
+    rmsL.reset(sampleRate, 0.5f);
+    rmsR.reset(sampleRate, 0.5f);
+    rmsL.setCurrentAndTargetValue(-100.f);
+    rmsR.setCurrentAndTargetValue(-100.f);
+
 
 }
 
@@ -153,23 +159,41 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto input = context.getInputBlock();
     auto output = context.getOutputBlock();
     
-    auto gainValuedB = treeState.getRawParameterValue("gainIn")->load();
-    auto gain = juce::Decibels::decibelsToGain(gainValuedB);
-    auto mix = treeState.getRawParameterValue("mix")->load();
-    drywet.pushDrySamples(input);
-    drywet.setWetMixProportion(mix);
-    updatePhaser();
-    
     auto* inL = input.getChannelPointer(0);
     auto* inR = input.getChannelPointer(1);
     auto* outL = output.getChannelPointer(0);
     auto* outR = output.getChannelPointer(1);
+    
+    auto gainValuedB = treeState.getRawParameterValue("gainIn")->load();
+    auto gain = juce::Decibels::decibelsToGain(gainValuedB);
+    buffer.applyGain(0, buffer.getNumSamples(), gain);
+    
+    const auto numSamples = buffer.getNumSamples();
+    rmsL.skip(numSamples);
+    rmsR.skip(numSamples);
+    {
+         const auto valueL = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples));
+         if (valueL < rmsL.getCurrentValue())
+             rmsL.setTargetValue(valueL);
+         else
+             rmsL.setCurrentAndTargetValue(valueL);
+    }
+    {
+         const auto valueR = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples));
+         if (valueR < rmsR.getCurrentValue())
+             rmsR.setTargetValue(valueR);
+         else
+             rmsR.setCurrentAndTargetValue(valueR);
+    }
+
+    auto mix = treeState.getRawParameterValue("mix")->load();
+    drywet.pushDrySamples(input);
+    drywet.setWetMixProportion(mix);
+    updatePhaser();
 
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-        auto gainSampleL = inL[sample] * gain;
-        auto gainSampleR = inR[sample] * gain;
-        auto phaserLeftOut = phaserL.processSample(gainSampleL);
-        auto phaserRightOut = phaserR.processSample(gainSampleR);
+        auto phaserLeftOut = phaserL.processSample(inL[sample]);
+        auto phaserRightOut = phaserR.processSample(inR[sample]);
         outL[sample] = phaserLeftOut;
         outR[sample] = phaserRightOut;
     }
@@ -245,4 +269,16 @@ void ICMPphaserAudioProcessor::updatePhaser() {
     phaserR.setFeedback(feedback);
     phaserR.setResonance(q);
     phaserR.setPhaseReversal(phaseOffset);
+}
+
+float ICMPphaserAudioProcessor::getRmsValue(const int channel)
+{
+    jassert(channel == 0 || channel == 1);
+    if (channel == 0) {
+        return rmsL.getNextValue();
+    }
+    if (channel == 1) {
+        return rmsR.getNextValue();
+    }
+    else return 0;
 }

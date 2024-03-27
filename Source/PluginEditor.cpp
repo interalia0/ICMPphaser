@@ -14,7 +14,7 @@
 ICMPphaserAudioProcessorEditor::ICMPphaserAudioProcessorEditor (ICMPphaserAudioProcessor& p,
                                                                 juce::AudioProcessorValueTreeState& treeState,
                                                                 juce::UndoManager& um)
-    : AudioProcessorEditor (&p), audioProcessor (p), undoManager (um), editorContent (treeState, um)
+    : AudioProcessorEditor (&p), audioProcessor (p), undoManager (um), editorContent(p, treeState, um)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -29,7 +29,7 @@ ICMPphaserAudioProcessorEditor::ICMPphaserAudioProcessorEditor (ICMPphaserAudioP
     editorContent.setSize (defaultWidth * 1.5, defaultHeight * 1.5);
     
     addAndMakeVisible (editorContent);
-    
+
 }
 
 ICMPphaserAudioProcessorEditor::~ICMPphaserAudioProcessorEditor()
@@ -46,6 +46,7 @@ void ICMPphaserAudioProcessorEditor::resized()
 {
     const auto factor = static_cast<float> (getWidth()) / defaultWidth;
     editorContent.setTransform (juce::AffineTransform::scale (factor));
+
 }
 
 bool ICMPphaserAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
@@ -69,3 +70,4 @@ bool ICMPphaserAudioProcessorEditor::keyPressed (const juce::KeyPress& key)
 
     return false;
 }
+

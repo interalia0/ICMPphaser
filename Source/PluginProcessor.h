@@ -60,8 +60,12 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParamLayout();
     juce::AudioProcessorValueTreeState treeState {*this, &undoManager, "params", createParamLayout()};
     juce::UndoManager undoManager;
+    
+    float getRmsValue(const int channel);
 
 private:
+    juce::LinearSmoothedValue<float> rmsL, rmsR;
+    
     juce::dsp::DryWetMixer<float> drywet;
     Phaser phaserL;
     Phaser phaserR;
