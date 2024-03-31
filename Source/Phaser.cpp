@@ -28,24 +28,29 @@ void Phaser::prepare(juce::dsp::ProcessSpec &spec, double sampleRate) {
 }
 
 void Phaser::setRate(float rate) {
-    jassert (juce::isPositiveAndBelow (rate, static_cast<float> (100.f)));
-    this->mRate = rate;
-    lfo.setFrequency(mRate);
+    if (!juce::approximatelyEqual(mRate, rate)) {
+        this->mRate = rate;
+        lfo.setFrequency(mRate);
+    }
 }
 
 void Phaser::setDepth(float depth) {
-    jassert(juce::isPositiveAndBelow(depth, 101.f));
-    this->mDepth = depth;
+    if (!juce::approximatelyEqual(mDepth, depth)) {
+        this->mDepth = depth;
+    }
 }
 
 void Phaser::setFeedback(float feedback) {
-    jassert(juce::isPositiveAndBelow (feedback, 101.f));
-    this->mFeedback = feedback;
+    if (!juce::approximatelyEqual(mFeedback, feedback)) {
+        this->mFeedback = feedback;
+    }
 }
 
 void Phaser::setResonance(float resonance) {
     auto mappedResonance = juce::jmap(resonance, 0.f, 1.f, 3.f, 0.61f);
-    this->mResonance = mappedResonance;
+    if (!juce::approximatelyEqual(mResonance, mappedResonance)) {
+        this->mResonance = mappedResonance;
+    }
 }
 
 void Phaser::setPhaseReversal(bool phase) {
@@ -65,6 +70,7 @@ float Phaser::processSample(float inputSample) {
     for (int i = 0; i < numFilters; ++i) {
         apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFreq[i], apfMaxFreq[i]));
     }
+    
     for (int i = 0; i < numFilters; ++i) {
         apf[i].setQ(mResonance);
     }

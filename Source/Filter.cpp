@@ -11,13 +11,17 @@
 #include "Filter.h"
 
 void Filter::setCutoff(float cutoff) {
-    this->mFc = cutoff;
-    updateCoefficents();
+    if (!juce::approximatelyEqual(mFc, cutoff)) {
+        this->mFc = cutoff;
+        updateCoefficents();
+    }
 }
 
 void Filter::setQ(float q) {
-    this->mQ = q;
-    updateCoefficents();
+    if (!juce::approximatelyEqual(mQ, q)) {
+        this->mQ = q;
+        updateCoefficents();
+    }
 }
 
 void Filter::setType(FilterType type) {
