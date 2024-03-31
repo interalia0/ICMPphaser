@@ -37,6 +37,8 @@ private:
     static constexpr int numFilters = 6;
     const float apfMinFreq[numFilters] = {32, 68, 96, 212, 320, 636};
     const float apfMaxFreq[numFilters] = {1500, 3400, 4800, 10000, 16000, 20480};
+    
+    int samplesSinceLastUpdate = 5;
 
     std::array<Filter, numFilters> apf;
     std::array<float, numFilters> apfOutputs;

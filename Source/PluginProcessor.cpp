@@ -240,7 +240,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"gainIn", 1}, "Gain", range{-60.f, 12.f, 0.1f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.01f}, 1.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"depth", 1}, "Lfo Depth", range{0.f, 100.f, 1.f}, 0.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"rate", 1}, "Lfo Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"rate", 1}, "Lfo Rate", range{0.02f, 7.f, 0.01, 0.3}, 1.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"q", 1}, "Q", range{0.f, 1.f, 0.01f}, 0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"feedback", 1}, "Feedback", range{0.f, 100.f, 0.1f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterBool>  (pID{"phaseOffset", 1}, "Offset", false));

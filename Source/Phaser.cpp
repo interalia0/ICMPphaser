@@ -18,6 +18,7 @@ void Phaser::reset() {
 }
 
 void Phaser::prepare(juce::dsp::ProcessSpec &spec, double sampleRate) {
+//    spec.sampleRate = sampleRate / 2;
     lfo.prepare(spec);
     lfo.initialise([](float x) {return std::sin(x);}, 128);
   
@@ -58,23 +59,28 @@ void Phaser::setPhaseReversal(bool phase) {
 }
 
 float Phaser::processSample(float inputSample) {
-    auto lfoOut = lfo.processSample(0.f);
-    auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
-    auto modValue = lfoOut * depth;
-    if (mIsPhaseFlipped) {
-        modHz = juce::jmap(modValue, -1.f, 1.f, 20000.f, 20.f);
-    } else {
-        modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
-    }
-    
-    for (int i = 0; i < numFilters; ++i) {
-        apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFreq[i], apfMaxFreq[i]));
-    }
-    
-    for (int i = 0; i < numFilters; ++i) {
-        apf[i].setQ(mResonance);
-    }
+    if (samplesSinceLastUpdate == 0) {
+        auto lfoOut = lfo.processSample(0.f);
+        auto depth = juce::jmap(mDepth, 0.f, 100.f, 0.f, 1.f);
+        auto modValue = lfoOut * depth;
         
+        if (mIsPhaseFlipped) {
+            modHz = juce::jmap(modValue, -1.f, 1.f, 20000.f, 20.f);
+        } else {
+            modHz = juce::jmap(modValue, -1.f, 1.f, 20.f, 20000.f);
+        }
+        
+        for (int i = 0; i < numFilters; ++i) {
+            apf[i].setCutoff(juce::jmap(modHz, 20.f, 20000.f, apfMinFreq[i], apfMaxFreq[i]));
+        }
+        
+        for (int i = 0; i < numFilters; ++i) {
+            apf[i].setQ(mResonance);
+        }
+        
+        samplesSinceLastUpdate = 5;
+    }
+
     float gamma1 = apf[5].getG_value();
     float gamma2 = apf[4].getG_value() * gamma1;
     float gamma3 = apf[3].getG_value() * gamma2;
@@ -99,8 +105,12 @@ float Phaser::processSample(float inputSample) {
         apfOutputs[i] = apf[i].processSample(apfInput);
         apfInput = apfOutputs[i];
     }
-    float finalApfOutput = apfInput;
+        
+    if (samplesSinceLastUpdate > 0) {
+        samplesSinceLastUpdate--;
+    }
     
+    float finalApfOutput = apfInput;
     float output = 0.707 * inputSample + 0.707 * finalApfOutput;
     return output;
 }
