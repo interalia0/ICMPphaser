@@ -61,9 +61,10 @@ public:
     juce::AudioProcessorValueTreeState treeState {*this, &undoManager, "params", createParamLayout()};
     juce::UndoManager undoManager;
     
-    float getRmsValue(const int channel);
+    float getRmsValue(const int channel); /// Function to get the current RMS value for updating the UI.
 
 private:
+    float calculateRms(const int channel, juce::dsp::AudioBlock<float>& block) const; /// Function for calculating the rms value from a AudioBlock object.
     juce::LinearSmoothedValue<float> rmsL, rmsR;
     
     juce::dsp::DryWetMixer<float> drywet;

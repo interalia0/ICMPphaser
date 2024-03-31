@@ -110,8 +110,6 @@ void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     rmsR.reset(sampleRate, 0.5f);
     rmsL.setCurrentAndTargetValue(-100.f);
     rmsR.setCurrentAndTargetValue(-100.f);
-
-
 }
 
 void ICMPphaserAudioProcessor::releaseResources()
@@ -151,8 +149,10 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    const auto numSamples = buffer.getNumSamples();
+
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear (i, 0, numSamples);
     
     juce::dsp::AudioBlock<float> block(buffer);
     juce::dsp::ProcessContextReplacing<float> context(block);
@@ -168,34 +168,31 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto gain = juce::Decibels::decibelsToGain(gainValuedB);
     buffer.applyGain(0, buffer.getNumSamples(), gain);
     
-    const auto numSamples = buffer.getNumSamples();
     rmsL.skip(numSamples);
     rmsR.skip(numSamples);
-    {
-         const auto valueL = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples));
-         if (valueL < rmsL.getCurrentValue())
-             rmsL.setTargetValue(valueL);
-         else
-             rmsL.setCurrentAndTargetValue(valueL);
-    }
-    {
-         const auto valueR = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples));
-         if (valueR < rmsR.getCurrentValue())
-             rmsR.setTargetValue(valueR);
-         else
-             rmsR.setCurrentAndTargetValue(valueR);
-    }
 
     auto mix = treeState.getRawParameterValue("mix")->load();
     drywet.pushDrySamples(input);
     drywet.setWetMixProportion(mix);
     updatePhaser();
 
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-        auto phaserLeftOut = phaserL.processSample(inL[sample]);
-        auto phaserRightOut = phaserR.processSample(inR[sample]);
-        outL[sample] = phaserLeftOut;
-        outR[sample] = phaserRightOut;
+    for (int sample = 0; sample < numSamples; ++sample) {
+        outL[sample] = phaserL.processSample(inL[sample]);
+        outR[sample] = phaserR.processSample(inR[sample]);
+    }
+    {
+        const auto valueL = juce::Decibels::gainToDecibels(calculateRms(0, output));
+            if (valueL < rmsL.getCurrentValue())
+                rmsL.setTargetValue(valueL);
+            else
+                rmsL.setCurrentAndTargetValue(valueL);
+    }
+    {
+        const auto valueR = juce::Decibels::gainToDecibels(calculateRms(1, output));
+            if (valueR < rmsR.getCurrentValue())
+                rmsR.setTargetValue(valueR);
+            else
+                rmsR.setCurrentAndTargetValue(valueR);
     }
     drywet.mixWetSamples(output);
 }
@@ -209,9 +206,7 @@ bool ICMPphaserAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* ICMPphaserAudioProcessor::createEditor()
 {
     return new ICMPphaserAudioProcessorEditor (*this, treeState, undoManager);
-
 //    return new juce::GenericAudioProcessorEditor (*this);
-
 }
 
 //==============================================================================
@@ -246,7 +241,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ICMPphaserAudioProcessor::cr
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"mix", 1}, "Mix", range{0.f, 1.f, 0.01f}, 1.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"depth", 1}, "Lfo Depth", range{0.f, 100.f, 1.f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"rate", 1}, "Lfo Rate", range{0.02f, 5.f, 0.01, 0.3}, 1.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"q", 1}, "Q", range{0.f, 1.f, 0.01f}, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"q", 1}, "Resonance", range{0.f, 1.f, 0.01f}, 0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat> (pID{"feedback", 1}, "Feedback", range{0.f, 100.f, 0.1f}, 0.f));
     layout.add(std::make_unique<juce::AudioParameterBool>  (pID{"phaseOffset", 1}, "Offset", false));
 
@@ -269,6 +264,20 @@ void ICMPphaserAudioProcessor::updatePhaser() {
     phaserR.setFeedback(feedback);
     phaserR.setResonance(q);
     phaserR.setPhaseReversal(phaseOffset);
+}
+
+float ICMPphaserAudioProcessor::calculateRms(const int channel, juce::dsp::AudioBlock<float>& block) const
+{
+    jassert(block.getNumSamples() >= 0);    
+    auto* data = block.getChannelPointer(channel);
+    double sum = 0.f;
+    
+    for (int i = 0; i < block.getNumSamples(); ++i)
+    {
+        auto sample = data[i];
+        sum += sample * sample;
+    }
+    return std::sqrt (sum / block.getNumSamples());
 }
 
 float ICMPphaserAudioProcessor::getRmsValue(const int channel)

@@ -25,7 +25,7 @@ public:
     float processSample(float inputSample);
     
     /// Old function for multi channel processing.
-    __attribute__((deprecated("not implemented, use processSample instead")))
+    __attribute__((deprecated("use processSample instead")))
     float processSampleStereo(int channel, float inputSample);    
 private:
     float mDepth = 0.f;

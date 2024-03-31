@@ -29,7 +29,7 @@ void HorizontalMeter::paint (Graphics& g) {
 
     if (level > 0) {
         using namespace Colours;
-        float interpolationFactor = jmap(level, -2.f, 6.f, 0.f, 1.f);
+        float interpolationFactor = jmap(level, -4.f, 3.f, 0.f, 1.f);
         Colour interpolatedColor = aquamarine.withBrightness(0.9f).interpolatedWith(red.withBrightness(0.8f), interpolationFactor);
         g.setColour(interpolatedColor);
     }
