@@ -27,9 +27,9 @@ void HorizontalMeter::paint (Graphics& g) {
     g.setColour(Colours::white.withBrightness(0.4f));
     g.fillRoundedRectangle(bounds, 5.f);
 
-    if (level > 0) {
+    if (level >= -15.f) {
         using namespace Colours;
-        float interpolationFactor = jmap(level, -4.f, 3.f, 0.f, 1.f);
+        float interpolationFactor = jmap(level, -15.f, 0.f, 0.f, 1.f);
         Colour interpolatedColor = aquamarine.withBrightness(0.9f).interpolatedWith(red.withBrightness(0.8f), interpolationFactor);
         g.setColour(interpolatedColor);
     }
@@ -40,7 +40,7 @@ void HorizontalMeter::paint (Graphics& g) {
         g.setColour(interpolatedColor);
     }
     const auto scaledX = juce::jmap(level, -60.f, 6.f, 0.f, static_cast<float>(getWidth()));
-    g.fillRoundedRectangle(bounds.removeFromLeft(scaledX), 5.f);  // draw some placeholder text
+    g.fillRoundedRectangle(bounds.removeFromLeft(scaledX), 5.f); 
 }
 
 void HorizontalMeter::resized()
