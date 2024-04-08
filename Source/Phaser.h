@@ -15,6 +15,7 @@
 class Phaser {
     
 public:
+    Phaser();
     void reset();
     void prepare(juce::dsp::ProcessSpec& spec, double sampleRate);
     void setRate(float rate);
@@ -22,11 +23,7 @@ public:
     void setFeedback(float feedback);
     void setResonance(float resonance);
     void setPhaseReversal(bool phase);
-    float processSample(float inputSample);
-    
-    /// Old function for multi channel processing.
-    __attribute__((deprecated("use processSample instead")))
-    float processSampleStereo(int channel, float inputSample);    
+    virtual float processSample(float inputSample) = default;
 private:
     float mDepth = 0.f;
     float mRate = 0.5f;
@@ -34,14 +31,18 @@ private:
     float mResonance = 0.7f;
     bool mIsPhaseFlipped = false;
     
-    static constexpr int numFilters = 6;
-    const float apfMinFreq[numFilters] = {32, 68, 96, 212, 320, 636};
-    const float apfMaxFreq[numFilters] = {1500, 3400, 4800, 10000, 16000, 20480};
+    int numFilters = 6;
+    std::vector<float> apfMinFreq = {32, 68, 96, 212, 320, 636};
+    std::vector<float> apfMaxFreq = {1500, 3400, 4800, 10000, 16000, 20480};
     
     int samplesSinceLastUpdate = 5;
 
-    std::array<Filter, numFilters> apf;
-    std::array<float, numFilters> apfOutputs;
+    std::vector<Filter> apf;
+    std::vector<float> apfOutputs;
     juce::dsp::Oscillator<float> lfo;
     float modHz = 0.f;
+       
+    /// Old function for multi channel processing.
+    __attribute__((deprecated("use processSample instead")))
+    float processSampleStereo(int channel, float inputSample);  
 };

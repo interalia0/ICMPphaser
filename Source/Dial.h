@@ -80,29 +80,18 @@ private:
 
         void editorShown (juce::TextEditor* editor) override;
     };
-
     TextBox textBox;
-
     float startAngle{};
     float endAngle{};
-
     float value{};
-
     juce::RangedAudioParameter& audioParam;
     juce::ParameterAttachment paramAttachment;
-
-    float sensitivity { 0.01f };
-
-    float interval { 1.0f };
-    float fineInterval { 0.1f };
-
+    float sensitivity = 0.01f;
+    float interval = 1.0f;
+    float fineInterval = 0.1f;
     juce::Point<float> mousePosWhenLastDragged;
-
     juce::Rectangle<float> dialBounds;
-    
     juce::ListenerList<Listener> listeners;
-
-    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Dial)
 };

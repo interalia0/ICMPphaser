@@ -35,6 +35,18 @@
       <FILE id="YXRZxe" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
       <FILE id="ekIMpm" name="Phaser.cpp" compile="1" resource="0" file="Source/Phaser.cpp"/>
       <FILE id="ioUNju" name="Phaser.h" compile="0" resource="0" file="Source/Phaser.h"/>
+      <FILE id="CEsXc5" name="PhaserAlgorithms.cpp" compile="1" resource="0"
+            file="Source/PhaserAlgorithms.cpp"/>
+      <FILE id="cq5Nes" name="PhaserAlgorithms.h" compile="0" resource="0"
+            file="Source/PhaserAlgorithms.h"/>
+      <FILE id="oPM7nV" name="SixStagePhaser.cpp" compile="1" resource="0"
+            file="Source/SixStagePhaser.cpp"/>
+      <FILE id="gD74Wx" name="SixStagePhaser.h" compile="0" resource="0"
+            file="Source/SixStagePhaser.h"/>
+      <FILE id="YLj5YG" name="ThreeStagePhaser.cpp" compile="1" resource="0"
+            file="Source/ThreeStagePhaser.cpp"/>
+      <FILE id="IGmo8g" name="ThreeStagePhaser.h" compile="0" resource="0"
+            file="Source/ThreeStagePhaser.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

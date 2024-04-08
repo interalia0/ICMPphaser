@@ -21,8 +21,6 @@ EditorContent::EditorContent (ICMPphaserAudioProcessor& p, juce::AudioProcessorV
       iGainAttachment (*treeState.getParameter("gainIn"), iGainSlider),
       depthAttachment (*treeState.getParameter("depth"), depthSlider),
       mixAttachment   (*treeState.getParameter("mix"), mixSlider)
-
-      
 {
     setWantsKeyboardFocus (true);
     rateDial.setInterval(0.01f);
@@ -75,9 +73,7 @@ EditorContent::EditorContent (ICMPphaserAudioProcessor& p, juce::AudioProcessorV
     
     addAndMakeVisible(meterL);
     addAndMakeVisible(meterR);
-    
     startTimerHz(24);
-    
 }
 
 EditorContent::~EditorContent()
@@ -111,7 +107,6 @@ void EditorContent::dialValueChanged(Dial* dial)
 void EditorContent::sliderValueChanged (juce::Slider* slider)
 {
 }
-
 
 void EditorContent::timerCallback()
 {

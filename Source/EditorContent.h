@@ -39,8 +39,7 @@ private:
     juce::Slider iGainSlider, depthSlider, mixSlider;
     juce::Label iGainLabel, depthLabel, mixLabel;
     
-    juce::SliderParameterAttachment iGainAttachment, depthAttachment, mixAttachment;
-    
+    juce::SliderParameterAttachment iGainAttachment, depthAttachment, mixAttachment;    
     HorizontalMeter meterL, meterR;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditorContent)
 };

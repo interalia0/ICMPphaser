@@ -114,8 +114,6 @@ void ICMPphaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
 void ICMPphaserAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -125,10 +123,6 @@ bool ICMPphaserAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
     juce::ignoreUnused (layouts);
     return true;
   #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
@@ -159,6 +153,7 @@ void ICMPphaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto input = context.getInputBlock();
     auto output = context.getOutputBlock();
     
+    jassert(totalNumInputChannels == 2);
     auto* inL = input.getChannelPointer(0);
     auto* inR = input.getChannelPointer(1);
     auto* outL = output.getChannelPointer(0);
